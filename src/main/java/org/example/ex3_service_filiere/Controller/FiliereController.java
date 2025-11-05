@@ -13,13 +13,15 @@ import org.example.ex3_service_filiere.Dto.FiliereRequestDTO;
 import org.example.ex3_service_filiere.Dto.FiliereResponseDto;
 import org.example.ex3_service_filiere.Service.FiliereServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Gestion des filieres",
+                title = "Service des filieres",
                 description = "Ce service permet de gérer les filières.",
                 version = "1.0.0"
         ),
@@ -30,10 +32,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/Filiere")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class FiliereController {
     private FiliereServiceImpl filiereService;
 
     public FiliereController(FiliereServiceImpl filiereService) {
+
         this.filiereService = filiereService;
     }
 
@@ -58,6 +62,8 @@ public class FiliereController {
                     @ApiResponse(responseCode = "5xx",description = "erreur serveur"),
             }
     )
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+
     @PostMapping
     public ResponseEntity<FiliereResponseDto> addFiliere(@RequestBody FiliereRequestDTO filiereRequestDTO) {
         FiliereResponseDto filiereResponseDto = filiereService.AddFiliere(filiereRequestDTO);
@@ -78,7 +84,7 @@ public class FiliereController {
                     @ApiResponse(responseCode = "5xx",description = "erreur serveur"),
             }
     )
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN','SCOPE_USER')")
     @GetMapping
     public ResponseEntity<List<FiliereResponseDto>> GetAllFilieres() {
         List<FiliereResponseDto> filiereResponseDtos = filiereService.GetAllFilieres();
@@ -100,6 +106,8 @@ public class FiliereController {
                     @ApiResponse(responseCode = "5xx",description = "erreur serveur"),
             }
     )
+
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN','SCOPE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<FiliereResponseDto> GetFiliereById(@PathVariable Long id) {
         FiliereResponseDto filiereResponseDto = filiereService.GetFiliereById(id);
@@ -129,6 +137,9 @@ public class FiliereController {
                     @ApiResponse(responseCode = "5xx",description = "erreur serveur"),
             }
     )
+
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+
     @PutMapping("/{id}")
     public ResponseEntity<FiliereResponseDto>  updateFiliere(@PathVariable Long id,@RequestBody FiliereRequestDTO filiereRequestDTO) {
         FiliereResponseDto filiereResponseDto = filiereService.UpdateFiliere(id, filiereRequestDTO);
@@ -145,6 +156,8 @@ public class FiliereController {
                     @ApiResponse(responseCode = "5xx",description = "erreur serveur"),
             }
     )
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+
     @DeleteMapping("/{id}")
     public ResponseEntity<FiliereResponseDto> deleteFiliere(@PathVariable Long id) {
         filiereService.DeleteFiliere(id);
